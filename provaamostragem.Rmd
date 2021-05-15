@@ -1,0 +1,464 @@
+---
+title: "Prova única de Técnicas de Amostragem"
+author: "Douglas Decicino de Andrade NºUSP: 10883512"
+date: "23/07/2020"
+header-includes:
+- \usepackage[T1]{fontenc}
+- \usepackage[utf8]{inputenc}
+- \usepackage {amsmath}
+- \usepackage{setspace}\singlespacing
+- \pagenumbering{gobble}
+- \usepackage{enumerate}
+output:
+  pdf_document: default
+  fig_height: 6
+  fig_width: 10
+  fontsize: 12pt
+  classoption: a4paper
+  html_document:
+  df_print: paged
+  word_document: default
+  documentclass: article
+---
+\newpage
+\pagenumbering{arabic} 
+\renewcommand{\tablename}{Tabela}
+\newcommand{\p}{\hspace{1cm}}
+
+\tableofcontents
+
+\newpage
+
+# 1)Cálculo dos parâmetros populacionais.
+
+\p Para a população dada no exercício, temos que X denota o número de apartamentos
+nos condomínios observados e Y denota o número de apartamentos alugados, sendo $X_i , i=1,2,...N$ e 
+$Y_i i=1,2,...,N$.
+
+\p Sendo assim, os principais parâmetros populacionais pedidos no exercício, são expressos da forma:
+
+\begin{itemize}
+\item $\mu_x=\frac{\sum_{i=1}^{N}X_i}{N}$ Sendo a média populacional de X.
+ 
+\item $\mu_y=\frac{\sum_{i=1}^{N}Y_i}{N}$ Sendo a média populacional de Y.
+  
+\item $\tau_y=\sum_{i=1}^{N}Y_i$ Sendo o total populacional de Y.
+  
+\item $\tau_x =\sum_{i=1}^{N}X_i$ Sendo o total populacional de X.
+  
+\item $\sigma^2_x=\frac{\sum_{i=1}^{N}\left (X_i-\mu_x\right)^2}{N}$  Sendo a variância não corrigida de X.
+  
+\item $\sigma^2_y=\frac{\sum_{i=1}^{N}\left(Y_i-\mu_y\right)^2}{N}$ Sendo a variância não corrigida de Y.
+
+\item $S^2_{xN}=\frac{\sum_{i=1}^{N}\left(X_i-\mu_x\right)^2}{N-1}$ Sendo a variância corrigida de X.
+
+\item $S^2_{yN}=\frac{\sum_{i=1}^{N}\left(Y_i-\mu_y\right)^2}{N-1}$ Sendo a variância corrigida de Y.
+
+\end{itemize}
+
+\p Realizando os respectivos cálculos no R, temos:
+
+```{r}
+
+library(readxl)
+
+data <- read_xlsx("dados.xlsx")
+
+#1)Cálculo dos parâmetros populacionais.
+
+(mu_y <- mean(data$Yi))#Média populacional de Y.
+
+(mu_x <- mean(data$Xi))#Média populacional de X.
+
+(tau_y <- sum(data$Yi))#Total populacional de Y.
+
+(tau_x <- sum(data$Xi))#Total populacional de X.
+
+(N <- length(data$i))#Tamnho da população.
+
+(sigma2_x <- var(data$Xi) * (N - 1)/N) #Sigma2 de X da população.
+
+(sigma2_y <- var(data$Yi) * (N - 1)/N) #Sigma2 de Y da população.
+
+(S2_x <- var(data$Xi)) #S2 de X da população.
+
+(S2_y <- var(data$Yi)) #S2 de Y da população.
+
+```
+\p Portando, temos que:
+
+\begin{itemize}
+\item $\mu_x= 27.37778$ Sendo a média populacional de X.
+ 
+\item $\mu_y= 18.68333$ Sendo a média populacional de Y.
+  
+\item $\tau_y=  3363 $ Sendo o total populacional de Y.
+  
+\item $\tau_x = 4928$ Sendo o total populacional de X.
+  
+\item $\sigma^2_x=  606.024$  Sendo a variância não corrigida de X.
+  
+\item $\sigma^2_y= 407.4719 $ Sendo a variância não corrigida de Y.
+
+\item $S^2_{xN}= 609.4096 $ Sendo a variância corrigida de X.
+
+\item $S^2_{yN}= 409.7483$ Sendo a variância corrigida de Y.
+
+\end{itemize}
+
+
+
+# 2)Cálculo do estimador de razão da média de apartamentos alugados, da variância aproximada e sua estimativa para este estimador e comparação das variâncias.
+
+\p Temos que, tendo os parâmetros populacionais de X como conhecidos da população, um estimador para a razão da média de apartamentos alugados é dado por $$\hat{\mu_y} = \bar{y}_r =  r\cdot\mu_x$$
+Sendo $r = \hat{R} = \frac{\bar{y}}{\bar{x}}$, portanto, temos os cálculos realizados abaixo em R e posteriormente suas respectivas fórmulas.
+
+```{r}
+#2)Estimador de razão da média, variância aproximada e sua estimativa para este estimador.
+
+set.seed(14091998)
+(amostra <- data[sample(nrow(data), 30, replace = F),])# Amostra com n = 30
+
+##Calculando estatísticas que iremos utilizar para o cálculo do exercício.
+n <- nrow(amostra)
+
+(y_bar <- mean(amostra$Yi)) #ybarra para a amostra.
+
+(x_bar <- mean(amostra$Xi)) #xbarra para a amostra.
+
+(r <- y_bar / x_bar) #Estimador da razão da amostra.
+```
+
+Sendo assim, temos que:
+
+\begin{itemize}
+
+  \item $r = \hat{R} = \frac{\bar{y}}{\bar{x}} = \frac{13.83333}{22.56667} = 0.6129985$
+    
+  \item $\mu_x = 27.37778$
+\end{itemize}
+   
+\p Podemos obter agora o estimador para o total y:
+
+```{r}
+(mu_hat_y_r <- r * mu_x) #Estimativa da média de Y.
+
+```
+
+Temos então que:
+
+\begin{itemize}
+
+  \item $\hat{\mu}_y =\bar{y}_r =r \cdot \mu_x = 0.6129985 \cdot 27.37778 = 16.78254$
+    
+\end{itemize}
+
+\p Agora, para o cálculo das variâncias exigidas no exercício, temos que, a variância aproximada é dada por $$Var(\bar{y}_r) \simeq \frac{1}{n} \left ( 1 - \frac{n}{N} \right ) \sigma^2_R$$ e o cálculo de uma estimativa para essa variãncia é dada por $$var(\bar{y}_r) = \frac{1}{n} \left ( 1 - \frac{n}{N} \right ) s^2_R$$, sendo $\sigma^2_R = \frac{1}{N}\sum_{i = 1}^{N}\left ( Y_i - RX_i \right )^2$ e $s^2_R = \frac{1}{n-1}\sum_{i = 1}^{n}\left ( Y_i - rX_i \right )^2$.
+
+\p Seguem os cálculos das fórmulas acima no R:
+
+```{r}
+#Cálculo da aproximação da variância do estimador e sua estimativa.
+
+(R <- sum(data$Yi)/sum(data$Xi)) #Razão populacional.
+
+(sigma2_r <- 1/N * sum((data$Yi - R * data$Xi)^2))
+
+(s2_r <- 1/(n-1) * sum((amostra$Yi - r * amostra$Xi)^2))
+
+(Var_mu_hat_y_r <- (1 / n) * (1 - n/N) * sigma2_r) #Variância aproximada do estimador.
+
+(var_mu_hat_y_r <- (1 / n) * (1 - n/N) * s2_r) #Estimativa da variância do estimador.
+
+```
+Temos então que:
+\begin{itemize}
+  \item $Var(\bar{y}_r) \simeq 1.027604$
+  \item $var(\bar{y}_r) = 0.3640298$
+\end{itemize}
+\p Podemos perceber que, para a amostra que retiramos com base na semente escolhida, a estimativa da variância é  menor que a variância aproximada do estimador($var(\bar{y}_r)=0.3640298 < Var(\bar{y}_r) \simeq 1.027604$).
+
+
+
+
+# 3)Cálculo do IC para a média populacional de Y e cálculo do vício do estimador.
+
+Sendo n e N suficientemente grandes, teremos que, $E(\bar{y}_r) = \mu_y$, ou seja, $\bar{y}_r$ é assintóticamente não viciado, então, podemos utilizar a convengência em distribuição assintótica para uma normal para o cálculo do IC, como veremos abaixo.
+
+$$Var(\bar{y}_r) \simeq \frac{1}{n} \left ( 1 - \frac{n}{N} \right ) \sigma^2_R$$
+
+Portanto, utilizando a variância aproximada $Var(\bar{y}_r)$, teremos que:
+
+
+$$Z = \frac{\bar{y}_r - E(\bar{y}_r)}{\sqrt{Var(\bar{y}_r)}} \sim N(0,1)$$
+é uma Quantidade Pivotal para $\mu_y$, sendo assim, fixando $\gamma = 0.95$, teremos que o intervalo de confiança para $\mu_y$ será dado por:
+
+```{r}
+#Intervalo de confiança de 95% para mu_y utilizando o estimador razão.
+(ICr <- c(mu_hat_y_r - qnorm(0.975)* sqrt(Var_mu_hat_y_r),
+         mu_hat_y_r + qnorm(0.975) * sqrt(Var_mu_hat_y_r)))
+
+```
+$$IC [0.95;\mu_y] = \left [ \bar{y}_r - Z_{0.975} \cdot \sqrt{Var(\bar{y}_r)} ; \bar{y}_r + Z_{0.975} \cdot \sqrt{Var(\bar{y}_r)}  \right ] =$$ $$ \left [ 16.78254 - 1.96 \cdot \sqrt{1.027604} ; 16.78254 + 1.96 \cdot \sqrt{1.027604}  \right ] = [14.79571; 18.76937]$$
+
+\p Para o vício do estimador, temos que, a estimativa do vício de $r$ é dada por:
+
+
+$$\mathcal{B}(r) = E(r - R) \simeq R \cdot (CV(\bar{x}))^2 \cdot \left \{ 1 - \rho(\bar{x}, \bar{y}) \cdot \frac{CV(\bar{y})}{CV(\bar{x})}\right \}$$
+Sendo 
+\begin{itemize}
+
+\item $CV(\bar{x}) = \frac{\sqrt{\frac{\sigma^2_X}{n}}}{\mu_x}$ 
+
+\item $CV(\bar{y}) =\frac{\sqrt{\frac{\sigma^2_Y}{n}}}{\mu_y}$
+
+\item $\rho(\bar{x}, \bar{y}) = \frac{\frac{1}{nN}\sum_{i=1}^{N}\left ( X_i - \mu_x \right )\left ( Y_i - \mu_y \right )}{\sqrt{\frac{\sigma^2_X}{n} } \sqrt{\frac{\sigma^2_Y}{n}}}$
+
+\end{itemize}
+
+Sendo assim, temos que $$\mathcal{B}(\bar{y}_r) = E(\mu_xr - \mu_xR) = \mu_x \cdot E(r - R) \simeq \mu_x \cdot R \cdot (CV(\bar{x}))^2 \cdot \left \{ 1 - \rho(\bar{x}, \bar{y}) \cdot \frac{CV(\bar{y})}{CV(\bar{x})}\right \}$$
+
+```{r}
+#Vício do estimador.
+CV_xbar <- (sqrt(sigma2_x/n)/ mu_x)
+
+CV_ybar <- (sqrt(sigma2_y/n)/mu_y)
+
+rho_xbarra_ybarra <- 1/(n*N) * sum((data$Xi - mu_x)*
+                                     (data$Yi - mu_y)) / (sqrt(sigma2_x / n) 
+                                                          * sqrt(sigma2_y/n))
+
+(Bybar_r <- mu_x * R * CV_xbar^2 * (1 - rho_xbarra_ybarra * CV_ybar/CV_xbar))
+
+```
+sendo assim:
+
+\begin{itemize}
+\item $\mathcal{B}(\bar{y}_r) = -0.07872335$
+\end{itemize}
+
+\p Podemos perceber que, pelo IC encontrado, nosso parâmetro populacional $\mu_y$ está contido no intervalo, e temos também que o vício do estimador é assintóticamente 0.
+
+
+
+# 4) Cálculo do estimador de regressão da média de apartamentos alugados, da variância e sua estimativa para este estimador e comparação das variâncias.
+
+Temos que a fórmula do estimador de regressão é dada por $$\bar{y}_{reg}  =  \bar{y} + b_0(\mu_x - \bar{x})$$
+
+E , uma estimativa para $b_0$ que minimiza a variância do estimador é $$\widehat{B}_{0}=\frac{\sum_{i \in s}\left(Y_{i}-\bar{y}\right)\left(X_{i}-\bar{x}\right)}{\sum_{i \in \boldsymbol{s}}\left(X_{i}-\bar{x}\right)^{2}}=\frac{s_{X Y}}{s_{X}^{2}}$$
+
+
+
+```{r}
+
+(B0_hat <- sum((amostra$Yi - mean(amostra$Yi)) * 
+                 (amostra$Xi - mean(amostra$Xi)))
+ /sum((amostra$Xi - mean(amostra$Xi))^2)) #Estimativa B0 que minimiza a variância do estimador.
+
+
+(mu_hat_y_reg <- mean(amostra$Yi) + B0_hat * (mu_x - x_bar )) #Estimador de regressão.
+
+```
+\p Para o cálculo da variância e de sua estimativa, temos que a variância para uma AASs é dada por $$\begin{aligned}
+\operatorname{Var}\left(\bar{y}_{\text {Reg }}\right) &=\frac{1-f}{n(N-1)} \sum_{i=1}^{N}\left\{Y_{i}-b_{0}\left(X_{i}-\mu_{X}\right)-\mu_{Y}\right\}^{2} \\
+&=\frac{1-f}{n}\left(S_{N_{Y}}^{2}-2 b_{0} S_{N_{X Y}}+b_{0}^{2} S_{N_{X}}^{2}\right) \\
+&=\frac{(1-f)}{n} S_{N_{D}}^{2}
+\end{aligned}$$
+com $S_{N_{X Y}}=\frac{1}{N-1} \sum_{i=1}^{N}\left(X_{i}-\mu_{X}\right)\left(Y_{i}-\mu_{Y}\right)$
+
+
+E um estimador para essa variância, é dado por $$\begin{aligned}
+\widehat{V}_{R e g}=\operatorname{var}\left(\bar{y}_{R e g}\right) &=\frac{1-f}{n(n-1)} \sum_{i \in \mathbf{s}}\left(\left(y_{i}-\bar{y}\right)-b_{0}\left(x_{i}-\bar{x}\right)\right)^{2} \\
+&=\frac{1-f}{n}\left(s_{Y}^{2}-2 b_{0} s_{X Y}+b_{0}^{2} s_{X}^{2}\right)
+\end{aligned}$$
+
+Segue abaixo os respectivos cálculos em R:
+
+
+```{r}
+# S^2_N_D
+(S2_ND <- var(data$Yi) - 2*B0_hat*( 1/(N-1) * sum((data$Xi - mu_x)*(data$Yi - mu_y))) +
+          B0_hat^2 * var(data$Xi))
+
+# Variancia do estimador tipo regressão.
+(Var_y_barra_reg <- (1-(n/N))/n * S2_ND)
+
+# Estimativa da variância do estimador tipo regressão.
+(var_y_barra_reg <- (1 - (n/N))/(n*(n-1)) 
+  * sum(((amostra$Yi - mean(amostra$Yi)) 
+         - B0_hat*(amostra$Xi - mean(amostra$Xi)))^2))
+
+```
+Sendo assim, temos:
+
+
+\begin{itemize}
+
+  \item $Var(\bar{y}_{reg}) = 1.092292$
+  \item $var(\bar{y}_{reg}) = 0.323641$
+  
+\end{itemize}
+\p Podemos perceber que, para a amostra que retiramos com base na semente escolhida, a estimativa da variância é  menor que a variância do estimador de regressão($var(\bar{y}_{reg}))=0.323641 < Var(\bar{y}_{reg}) = 1.092292)$.
+
+# 5)Cálculo do IC para a média populacional de Y com o estimador de regressão e cálculo do vício do estimador.
+
+
+
+Sendo $E(\bar{y}_{reg}) = \mu_y$
+
+E,
+
+$Var(\bar{y}_{reg}) = 1.092292$ definido acima.
+
+Portanto, utilizando a variância $Var(\bar{y}_{reg})$, teremos que:
+
+
+$$Z = \frac{\bar{y}_{reg} - E(\bar{y}_{reg})}{\sqrt{Var(\bar{y}_{reg})}} \sim N(0,1)$$
+é uma Quantidade Pivotal para $\mu_y$, sendo assim, fixando $\gamma = 0.95$, teremos que o intervalo de confiança para $\mu_y$ será dado por:
+
+```{r}
+#Intervalo de confiança de 95% para mu_y com o estimador regressão.
+(ICreg <- c(mu_hat_y_reg - qnorm(0.975)* sqrt(Var_y_barra_reg),
+         mu_hat_y_reg + qnorm(0.975) * sqrt(Var_y_barra_reg)))
+
+```
+$$IC [0.95;\mu_y] = \left [ \bar{y}_r - Z_{0.975} \cdot \sqrt{Var(\bar{y}_r)} ; \bar{y}_r + Z_{0.975} \cdot \sqrt{Var(\bar{y}_r)}  \right ] =$$ $$ \left [ 17.04328 - 1.96 \cdot \sqrt{1.092292} ; 17.04328 + 1.96 \cdot \sqrt{1.092292}  \right ] = [14.99487 ; 19.09170]$$
+\p Para o vício do estimador de regressão para uma AAS, temos:
+$$\begin{aligned}
+E\left(\bar{y}_{\text {Reg}}\right) &=E\left(\bar{y}+b_{0}\left(\mu_{X}-\bar{x}\right)\right) \\
+&=E(\bar{y})+b_{0}\left(\mu_{X}-E(\bar{x})\right) \\
+&=\mu_{Y}+b_{0}\left(\mu_{X}-\mu_{X}\right)=\mu_{Y}
+\end{aligned}$$
+Sendo assim, temos que o estimador de regressão da média de Y é não viesado, então, segue que $\mathcal{B}(\bar{y}_{reg}) = 0$
+
+\p Podemos perceber que o parâmetro populacional $\mu_y$ está contido no IC calculado acima. E o estimador nesse caso é não viciado.
+
+# 6)Estimativa do parâmetro de interesse sem utilizar a variável auxiliar X, IC com essa estimativa para o parâmetro e vício do estimador.
+
+\p Temos que, não utilizando a variável auxiliar X, a estimativa para o parâmetro da média populacional de Y ($\mu_y$) para uma AASs é $\bar{y}=\frac{\sum_{i \in s} Y_{i}}{n}=\frac{t(s)}{n}=\hat{\mu}$ e sua variância é dada por $\operatorname{Var}(\bar{y})=\frac{\sigma^{2}}{n}$
+
+Segue abaixo os cálculos das fórmulas acima no R:
+
+```{r}
+
+(ybar <- sum(amostra$Yi)/n)
+
+(Var_ybar <- S2_y / n * (1 - (n/N)))
+
+```
+\p Teremos que, para o cálculo do IC, sendo $E(\bar{y}) = \mu_y$
+
+E,
+
+$$Var(\bar{y}) = 11.3819$$ Dada no exercício 
+
+Portanto, utilizando a variância do estimador $Var(\bar{y})$, teremos que:
+
+
+$$Z = \frac{\bar{y} - E(\bar{y})}{\sqrt{Var(\bar{y})}} \sim N(0,1)$$
+é uma Quantidade Pivotal para $\mu_y$, sendo assim, fixando $\gamma = 0.95$, teremos que o intervalo de confiança para $\mu_y$ será dado por:
+
+```{r}
+#Intervalo de confiança de 95% para mu_y com o estimador ybarra.
+(ICybar <- c(ybar - qnorm(0.975)* sqrt(Var_ybar),
+         ybar + qnorm(0.975) * sqrt(Var_ybar)))
+
+```
+$$IC [0.95;\mu_y] = \left [ \bar{y}_r - Z_{0.975} \cdot \sqrt{Var(\bar{y}_r)} ; \bar{y}_r + Z_{0.975} \cdot \sqrt{Var(\bar{y}_r)}  \right ] =$$ $$ \left [ 13.83333 - 1.96 \cdot \sqrt{11.3819} ; 13.83333 + 1.96 \cdot \sqrt{11.3819}  \right ] = [7.220989 ; 20.445677]$$
+\p Para o vício do estimador sem a variável X para uma AAS, temos:
+$$E(\bar{y})=\frac{1}{n} E(t)=\frac{n \mu_y}{n}=\mu_y$$
+Sendo assim, temos que o estimador sem uso de variável auxiliar da média de Y é não viesado, então, segue que $\mathcal{B}(\bar{y}) = 0$
+
+Podemos perceber que o intervalo de confiança utilizando um estimador sem o uso de uma variável auxiliar ($\bar{y}$) é muito mais largo que um IC utilizando $\bar{y}_{reg}$ ou $\bar{y}_{r}$ , pois sua variância é bem maior também.
+
+# 7)Estimativa do parâmetro de interesse dada pelo exrcício 6.27, IC com essa estimativa para o parâmetro e vício do estimador.
+
+\p Temos que o estimador dado no exercício 6.27 é $\bar{y}_{D}=\bar{y}+\left(\mu_{X}-\bar{x}\right)$ e sua variância pode ser calculada da seguinte forma:
+
+
+
+Defina $D_{i}=Y_{i}-b_{0}\left(X_{i}-\mu_{X}\right), i=1, \ldots, N .$ Tem-se então que:
+\[
+\mu_{D}=\bar{D}=\frac{1}{N} \sum_{i=1}^{N} D_{i}=\frac{1}{N} \sum_{i=1}^{N} Y_{i}-b_{0}\left(X_{i}-\mu_{X}\right)=\mu_{y}=\bar{Y}
+\]
+Seja $\bar{d}=\frac{1}{n} \sum_{i \in s} D_{i}$ a média de uma amostra de tamanho $n$ da população dos $D^{\prime}$ s. Note que $\bar{d}=\bar{y}_{R e g}$
+Assim, deduz-se que:
+\[
+\operatorname{Var}(\bar{d})=\frac{1-f}{n} S_{N_{D}}^{2}
+\]
+em que:
+\[
+\begin{aligned}
+S_{N_{D}}^{2} &=\frac{1}{N-1} \sum_{i=1}^{N}\left(D_{i}-\bar{D}\right)^{2}=\frac{1}{N-1} \sum_{i=1}^{N}\left(Y_{i}-b_{0}\left(X_{i}-\mu_{X}\right)-\mu_{Y}\right)^{2} \\
+&=\frac{1}{N-1} \sum_{i=1}^{N}\left(\left(Y_{i}-\mu_{Y}\right)-b_{0}\left(X_{i}-\mu_{X}\right)\right)^{2} \\
+&\left.=\frac{1}{N-1}\left\{\sum_{i=1}^{N}\left(Y_{i}-\mu_{Y}\right)^{2}-2 b_{0} \sum_{i=1}^{N}\left(X_{i}-\mu_{X}\right)\left(Y_{i}-\mu_{Y}\right)\right)+b_{0}^{2} \sum_{i=1}^{N}\left(X_{i}-\mu_{X}\right)^{2}\right\} \\
+&=S_{N_{Y}}^{2}-2 b_{0} S_{N_{X Y}}+b_{0}^{2} S_{N_{X}}^{2}
+\end{aligned}
+\]
+Portanto,
+\[
+\operatorname{Var}(\bar{d})=\operatorname{Var}\left(\bar{y}_{\operatorname{Reg}}\right)=\frac{1-f}{n}\left(S_{N_{Y}}^{2}-2 b_{0} S_{N_{X Y}}+b_{0}^{2} S_{N_{X}}^{2}\right)
+\]
+
+Segue abaixo os respectivos cálculos.
+
+```{r}
+(y_bar_D <- mean(amostra$Yi) + (mu_x - x_bar ))#Estimador dado no exercício 6.27.
+
+(Var_y_D <- 1/n * (1 - n/N) * (var(data$Yi) + var(data$Xi) -
+                                 2 * cov(data$Xi,data$Yi))) #Variância do Estimador 6.27.
+
+```
+Sendo assim, 
+\begin{itemize}
+  \item $\bar{y}_D = 18.64444$
+  \item $Var(\bar{y}_D) = 1.59345$
+\end{itemize}
+
+
+\p Sendo $E(\bar{y}_{D}) = \mu_y$
+
+E,
+
+$Var(\bar{y}_{D}) = 1.59345$ definido acima.
+
+Portanto, utilizando a variância $Var(\bar{y}_{D})$, teremos que:
+
+
+$$Z = \frac{\bar{y}_{D} - E(\bar{y}_{D})}{\sqrt{Var(\bar{y}_{D})}} \sim N(0,1)$$
+é uma Quantidade Pivotal para $\mu_y$, sendo assim, fixando $\gamma = 0.95$, teremos que o intervalo de confiança para $\mu_y$ será dado por:
+
+```{r}
+#Intervalo de confiança de 95% para mu_y com o estimador ybarra.
+(ICybar_D <- c(y_bar_D - qnorm(0.975)* sqrt(Var_y_D),
+         y_bar_D + qnorm(0.975) * sqrt(Var_y_D)))
+
+```
+$$IC [0.95;\mu_y] = \left [ \bar{y}_D - Z_{0.975} \cdot \sqrt{Var(\bar{y}_D)} ; \bar{y}_D + Z_{0.975} \cdot \sqrt{Var(\bar{y}_D)}  \right ] =$$ $$ \left [ 18.64444 - 1.96 \cdot \sqrt{1.59345} ; 18.64444 + 1.96 \cdot \sqrt{1.59345}  \right ] = [16.17034 ; 21.11855]$$
+\p Quanto ao vício do estimador , temos 
+
+\[
+E\left[\bar{y}_{D}\right]=E\left[\bar{y}+\left(\mu_{X}-\bar{x}\right)\right]=E[\bar{y}]+\left(\mu_{X}-E[\bar{x}]\right)
+\]
+Como $\bar{x}$ é um estimador não-viciado para $\mu_{X}$ e $\bar{y}$ é um estimador não-viciado para $\mu_{Y},$ temos que :
+\[
+E\left[\bar{y}_{D}\right]=\mu_{Y}+\left(\mu_{X}-\mu_{X}\right)=\mu_{Y}
+\]
+Portanto, $\bar{y}_{D}$ é um estimador não-viciado para $\mu_{Y}$.
+
+\p Podemos perceber que $\mu_y$ está contido no IC calculado acima, e também que nosso estimador é não viciado.
+
+# 8)Qual estimador (de razão ou de regressão ou outros) eu recomendaria.
+
+\p Vamos comparar os $EQM$(erros quadrático médio) de cada estimador encontrado durante a prova, temos que a fórmula do $EQM$ de um estimador da média populacional é dada por
+
+$$EQM(\hat{\mu}_Y) = Var(\hat{\mu}_Y)  + \mathcal{B}(\hat{\mu}_Y)^2$$
+Sendo assim, temos que:
+\begin{itemize}
+\item $EQM(\bar{y}_{D}) = Var(\bar{y}_{D}) + \mathcal{B}(\bar{y}_{D})^2 = 1.59345 + 0 = 1.59345 $
+\item $EQM(\bar{y}_{reg}) = Var(\bar{y}_{reg}) + \mathcal{B}(\bar{y}_{reg})^2 =  1.092292 + 0 =  1.092292$
+\item $EQM(\bar{y}_{r}) = Var(\bar{y}_{r}) + \mathcal{B}(\bar{y}_{r})^2 = 1.027604 +  (-0.07872)^2 = 1.033801$
+\item $EQM(\bar{y}) = Var(\bar{y}) + \mathcal{B}(\bar{y})^2 = 11.3819 + 0 = 11.3819$
+\end{itemize}
+
+\p Podemos perceber que, para a amostra escolhida, neste caso temos que o estimador da razão($\bar{y}_{r}$) é o que possui o menor EQM, portanto, ele é, dentre todos os calculados no exercício, o melhor que poderíamos escolher.
