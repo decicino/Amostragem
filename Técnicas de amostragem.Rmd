@@ -1,5 +1,5 @@
 ---
-title: "Prova única de Técnicas de Amostragem"
+title: "Técnicas de Amostragem"
 author: "Douglas Decicino de Andrade NºUSP: 10883512"
 date: "23/07/2020"
 header-includes:
